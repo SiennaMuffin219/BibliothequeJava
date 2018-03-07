@@ -14,9 +14,12 @@ public class DocBibliotheque
     private int annee;
     private String codeArchivage, titre, auteur;
     private String status;
+    private MembreBibliotheque membreQuiReserve = null, membreQuiEmprunte = null;
+    
+    private int nbEnPlace, nbEmprunte, nbPileRetour, nbSectionReservation;
     
     public DocBibliotheque(String codeArchivage, String titre, String auteur, int annee)
-    {
+    {    
         this.codeArchivage = codeArchivage;
         this.titre = titre;
         this.auteur = auteur;
@@ -24,48 +27,85 @@ public class DocBibliotheque
         this.status = "EnPlace";
     }
     
-    public boolean emprunter()
+    public boolean emprunter(MembreBibliotheque membre)
     {
-        if (this.estEnPlace() || this.estEnAttente())
-        {
+        if (this.estEnPlace() || this.estEnSectionReservation())
+        {            
+            if (this.estEnPlace())
+            {
+                nbEnPlace--;
+                membreQuiReserve = membre;
+            }
+            else
+            {
+                if (getMembreQuiEmprunte().equals(membre))
+                {
+                    nbSectionReservation--;
+                    membreQuiEmprunte = membre;
+                    membreQuiReserve = null;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            
+            nbEmprunte++;
             this.status = "EmprunteNonReserve";
             return true;
         }
         return false;
     }
-    public boolean reserver()
+    
+    public boolean reserver(MembreBibliotheque membre)
     {
         if (this.estEmprunte())
         {
             this.status = "ReserveEtEmprunte";
+            membreQuiEmprunte = membre;
             return true;
         }
         return false;
     }
-    public boolean annulerReservation()
+    
+    public boolean annulerReservation(MembreBibliotheque membre)
     {
-        if (this.estReserve())
+        if (getMembreQuiReserve().equals(membre))
         {
-            this.status = "EmprunteNonReserve";
-            return true;
-        }
-        if (this.estEnAttente())
-        {
-            this.status = "PileRetour";
-            return true;
+            if (this.estReserve())
+            {
+                this.status = "EmprunteNonReserve";
+                membreQuiReserve = null;
+                return true;
+            }
+            if (this.estEnSectionReservation())
+            {
+                nbEmprunte--;
+                this.status = "PileRetour";
+                nbPileRetour++;
+                membreQuiReserve = null;
+                return true;
+            }
         }
         return false;
     }
+    
     public boolean retourner()
     {
         if (this.estEmprunte())
         {
+            nbEmprunte--;
             this.status = "PileRetour";
+            nbPileRetour++;
+            membreQuiEmprunte = null;
             return true;
         }
         if (this.estReserve())
         {
-            this.status = "PileReservation";
+            nbEmprunte--;
+            this.status = "SectionReservation";
+            nbSectionReservation++;
+            membreQuiEmprunte = null;
             return true;
         }
         return false;
@@ -74,10 +114,18 @@ public class DocBibliotheque
     {
         if (this.estEnPileRetour())
         {
+            nbPileRetour--;
             this.status = "EnPlace";
+            nbEnPlace++;
             return true;
         }
         return false;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return "Document :\n\tTitre : " + this.titre + "\n\tAuteur : " + this.auteur + "\n\tAnnée : " + this.annee + "\n\tCode d'archivage : " + this.codeArchivage + "\n\tMembre qui emprunte : " + this.getMembreQuiEmprunte() + "\n\tMembre qui réserve : " + this.getMembreQuiReserve();
     }
 
     public String getStatus()
@@ -100,9 +148,9 @@ public class DocBibliotheque
     {
         return this.status.equals("PileRetour");
     }
-    public boolean estEnAttente()
+    public boolean estEnSectionReservation()
     {
-        return this.status.equals("PileReservation");
+        return this.status.equals("SectionReservation");
     }
     
     public String getCodeArchivage()
@@ -137,5 +185,13 @@ public class DocBibliotheque
     public void setAnnee(int annee)
     {
         this.annee = annee;
+    }
+
+    public MembreBibliotheque getMembreQuiReserve() {
+        return membreQuiReserve;
+    }
+
+    public MembreBibliotheque getMembreQuiEmprunte() {
+        return membreQuiEmprunte;
     }
 }

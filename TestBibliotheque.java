@@ -16,17 +16,17 @@ public class TestBibliotheque {
         DocBibliotheque livre3 = new DocBibliotheque("42424242", "La vie, l'univers et tout le reste", "Douglas Adams", 2005);
         DocBibliotheque livre4 = new DocBibliotheque("1337", "1337", "M. 1337", 1337);
         
-        livre3.emprunter();
-        livre3.reserver();
+        livre3.emprunter(new MembreBibliotheque("c", "d", "032654", "42 rhbkfdsj"));
+        livre3.reserver(new MembreBibliotheque("a", "b", "0452596", "42 rue"));
         System.out.println("livre3 peut être rangé ? " + livre3.ranger());
-        livre3.retourner();
         
         System.out.println("livre4 en place ? " + livre4.estEnPlace());
-        livre4.emprunter();
-        livre4.reserver();
+        livre4.emprunter(new MembreBibliotheque("e", "f", "099451", "1337 "));
+        MembreBibliotheque membre = new MembreBibliotheque("a", "b", "0452596", "42 rue");
+        livre4.reserver(membre);
         System.out.println("livre4 emprunté ? " + livre4.estEmprunte());
         System.out.println("livre4 reservé ? " + livre4.estReserve());
-        livre4.annulerReservation();
+        livre4.annulerReservation(membre);
         System.out.println("livre4 reservé ? " + livre4.estReserve());
         livre4.retourner();
         livre4.ranger();
@@ -55,5 +55,8 @@ public class TestBibliotheque {
         System.out.println(membre1.getNumAbonne());
         MembreBibliotheque membre2 = new MembreBibliotheque("42", "42", "42", "42");
         System.out.println(membre2.getNumAbonne());
+        
+        System.out.println(membre.toString());
+        System.out.println(livre3.toString());
     }
 }

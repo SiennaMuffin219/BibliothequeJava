@@ -23,6 +23,12 @@ public class MembreBibliotheque
         this.adresse = adresse;
         this.numAbonne = ++dernierNumeroAbonne;
     }
+    
+    @Override
+    public String toString()
+    {
+        return "Membre :\n\tNom : " + this.nom + "\n\tPrénom : " + this.prenom + "\n\tNuméro de téléphone : " + this.numTelephone + "\n\tAdresse : " + this.adresse;              
+    }
 
     public String getNom()
     {
